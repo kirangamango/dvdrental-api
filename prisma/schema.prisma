@@ -52,3 +52,20 @@ model FilmActor {
   @@unique([film_id, actor_id])
   @@map("film_actor")
 }
+
+model FilmCategory {
+  category_id Int
+  film_id     Int
+  last_update DateTime
+
+  @@unique([category_id, film_id])
+  @@map("film_category")
+}
+
+model Category {
+  category_id Int      @unique
+  name        String
+  last_update DateTime
+
+  @@map("category")
+}

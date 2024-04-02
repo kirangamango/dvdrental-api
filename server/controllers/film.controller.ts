@@ -4,6 +4,7 @@ import { RequestHandler } from "express";
 
 export const FilmController: {
   getAll: RequestHandler;
+  getAllFilmsCategory: RequestHandler;
 } = {
   async getAll(req, res, next) {
     try {
@@ -44,6 +45,29 @@ export const FilmController: {
     } catch (err) {
       console.error({ err });
       throw new Error("Failed to get films");
+    }
+  },
+  async getAllFilmsCategory(req, res, next) {
+    try {
+      const filmsCategory: any =
+        await prisma.$queryRaw`select name,count(f1.film_id) as filmCount from film f1, 
+        (select name, c1.category_id, film_id from film_category fc1, category c1 where fc1.category_id = c1.category_id) as r1 
+        where r1.film_id = f1.film_id group by name`;
+
+      filmsCategory.forEach((item: any) => {
+        item.filmcount = Number(item.filmcount);
+      });
+
+      console.log("fillms category", filmsCategory);
+
+      res.json({
+        success: true,
+        data: filmsCategory,
+        total: filmsCategory.length,
+      });
+    } catch (err) {
+      console.log({ err });
+      throw new Error("Failed to fetch all films category");
     }
   },
 };
