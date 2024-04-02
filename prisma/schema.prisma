@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MpaaRating {
+  G
+  PG
+  PG_13 @map("PG-13")
+  R
+  NC_17 @map("NC-17")
+
+  @@map("mpaa_rating")
+}
+
+model Actor {
+  actor_id    Int      @unique @default(autoincrement())
+  first_name  String
+  last_name   String
+  last_update DateTime
+
+  @@map("actor")
+}
+
+model Film {
+  film_id          Int        @unique @default(autoincrement())
+  title            String
+  description      String
+  release_year     Int
+  language_id      Int
+  rental_duration  Int
+  rental_rate      Float
+  rating           MpaaRating
+  length           Int
+  replacement_cost Float
+  special_features String[]
+  fulltext         String
+  last_update      DateTime
+
+  @@map("film")
+}
+
+model FilmActor {
+  actor_id    Int
+  film_id     Int
+  last_update DateTime
+
+  @@unique([film_id, actor_id])
+  @@map("film_actor")
+}
