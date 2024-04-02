@@ -23,13 +23,23 @@ export const FilmController: {
         right join film_actor fa1 on f1.film_id = fa1.film_id 
         left join actor a1 on a1.actor_id = fa1.actor_id) ${queryStr} ${paginationStr}`;
 
+      const countQuery = `select count(*) from (select f1.film_id,title,fa1.actor_id,first_name, last_name  from film f1 
+        right join film_actor fa1 on f1.film_id = fa1.film_id 
+        left join actor a1 on a1.actor_id = fa1.actor_id) ${queryStr}`;
+
       console.log({ isActorNull, queryStr });
       const films: any = await prisma.$queryRaw`${Prisma.raw(baseQuery)}`;
-
+      const filmsTotal: any = await prisma.$queryRaw`${Prisma.raw(countQuery)}`;
+      const totalCount = Number(filmsTotal[0]["count"]);
+      console.log({ filmsTotal });
       res.json({
         success: true,
         data: films,
-        total: films.length,
+        pagination: {
+          total: totalCount,
+          page: Number(page),
+          limit: Number(limit),
+        },
       });
     } catch (err) {
       console.error({ err });
